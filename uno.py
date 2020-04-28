@@ -1,4 +1,28 @@
+import pygame
 from random import shuffle
+
+#RGB Colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+clock = pygame.time.Clock()
+
+def main():
+    pygame.init()
+    window = pygame.display.set_mode((750,750))
+
+    while True:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                return
+
+        #Display all info after this point
+        window.fill(white)
+
+
+        #Update the Display
+        pygame.display.update()
+        clock.tick(60)
 
 def createDeck():
     deck = []
@@ -33,18 +57,23 @@ def getPlayers():
         players.append(playerName)
     return players
 
-
-hands = {}
+players = getPlayers()  
+status = {}
 
 for player in players:
-    hands[player] = []
-
+    status[player] = {"score": 0, "hand": []}
 
 for i in range(7):
     for player in players:
-        hands[player].append(cardDeck[0])
+        status[player]["hand"].append(cardDeck[0])
         cardDeck.pop(0)
 
+discardPile = cardDeck.pop(0)
+
+if __name__=="__main__":
+    main()
+    pygame.quit()
 
 
 
+     
