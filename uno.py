@@ -4,22 +4,37 @@ from random import shuffle
 #RGB Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
+green = (0, 255, 0)
+gold = (212,175,55)
+red = (255, 0, 0)
+blue = (0, 0, 255)
 
 clock = pygame.time.Clock()
+
 
 def main():
     pygame.init()
     window = pygame.display.set_mode((750,750))
+    count = 0
+    round = 0
+
+    players = getPlayers()
 
     while True:
+        player = 0
+        pos = pygame.mouse.get_pos()
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 return
+            if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
+                if pos[0] in range(300,451) and pos[1] in range(450,501):
+                    count += 1
+
 
         #Display all info after this point
         window.fill(white)
-
-
+        startButton(window,count)
+        displayUNO(window,count)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -47,28 +62,48 @@ def createDeck():
     shuffle(deck)
     return deck
 
-cardDeck = createDeck()
-
 def getPlayers():
-    numPlayers = int(input("How many Players?\n"))
+    numPlayers = int(input("How many Players?  "))
     players = []
     for i in range(numPlayers):
         playerName = input("Player {} what is your name?  ".format(i+1))
         players.append(playerName)
     return players
 
-players = getPlayers()  
-status = {}
+# status = {}
 
-for player in players:
-    status[player] = {"score": 0, "hand": []}
+# for player in players:
+#     status[player] = {"score": 0, "hand": []}
 
-for i in range(7):
-    for player in players:
-        status[player]["hand"].append(cardDeck[0])
-        cardDeck.pop(0)
+# for i in range(7):
+#     for player in players:
+#         status[player]["hand"].append(cardDeck[0])
+#         cardDeck.pop(0)
 
-discardPile = cardDeck.pop(0)
+# discardPile = cardDeck.pop(0)
+
+
+def startButton(window, count):
+    font = pygame.font.SysFont("arial", 35)
+    pos = pygame.mouse.get_pos()
+    if count < 1:
+        buttonColor = black
+        buttonSize = 2
+        if pos[0] in range(300,451):
+            if pos[1] in range (450,501):
+                buttonColor = green
+                buttonSize = 4
+        pygame.draw.rect(window,buttonColor, (300,450,150,50),buttonSize)
+        start = font.render("START", 1, black)
+        window.blit(start,(318,458))
+
+def displayUNO(window, count):
+    if count < 1:
+        font = pygame.font.SysFont("arial", 200)
+        uno= font.render("UNO!", 1, gold)
+        window.blit(uno,(125, 200))
+
+def displayPlayer(window,)
 
 if __name__=="__main__":
     main()
