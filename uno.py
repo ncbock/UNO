@@ -21,7 +21,7 @@ def main():
     players = getPlayers()
 
     playTurn = 0
-
+    printOne = 0
     while True:
         player = 0
         pos = pygame.mouse.get_pos()
@@ -44,6 +44,7 @@ def main():
         displayUNO(window,count)
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
+        hands, deck = createHands(players)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -79,19 +80,23 @@ def getPlayers():
         players.append(playerName)
     return players
 
-# status = {}
+def createHands(players):
+    deck = createDeck()
+    #Dictionary will contain players, and a list with their hands
+    currentHands = {}
+    #Create the players and their empty hands.
+    for player in players:
+        currentHands[player] = []
+    #Each player to recieve 7 cards, essentially deal the cards
+    for i in range(7):
+        for player in players:
+            #Add first card of the shuffled deck to the players hand
+            currentHands[player].append(deck[0])
+            #Remove the added card from the deck
+            deck.pop(0)
 
-# for player in players:
-#     status[player] = {"score": 0, "hand": []}
-
-# for i in range(7):
-#     for player in players:
-#         status[player]["hand"].append(cardDeck[0])
-#         cardDeck.pop(0)
-
-# discardPile = cardDeck.pop(0)
-
-
+    return currentHands, deck
+    
 def startButton(window, count):
     font = pygame.font.SysFont("arial", 35)
     pos = pygame.mouse.get_pos()
