@@ -20,6 +20,8 @@ def main():
 
     players = getPlayers()
 
+    playTurn = 0
+
     while True:
         player = 0
         pos = pygame.mouse.get_pos()
@@ -29,12 +31,19 @@ def main():
             if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
                 if pos[0] in range(300,451) and pos[1] in range(450,501):
                     count += 1
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
+                if pos[0] in range(50,201) and pos[1] in range(50,101):
+                    playTurn += 1
+                    if playTurn == len(players):
+                        playTurn = 0
 
 
         #Display all info after this point
         window.fill(white)
         startButton(window,count)
         displayUNO(window,count)
+        whoseTurn(window, count, playTurn, players)
+        playCardButton(window,count)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -103,7 +112,25 @@ def displayUNO(window, count):
         uno= font.render("UNO!", 1, gold)
         window.blit(uno,(125, 200))
 
-def displayPlayer(window,)
+def whoseTurn(window, count, turn, playerList):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 45)
+        player = playerList[turn]
+        playerTurn = font.render("{} it's your turn!".format(player), 1, gold)
+        window.blit(playerTurn,(300,50))
+
+def playCardButton(window, count):
+    if count > 0:
+        font = pygame.font.SysFont("arial",30)
+        pos = pygame.mouse.get_pos()
+        buttonColor = black
+        buttonSize = 2
+        if pos[0] in range(50,201) and pos[1] in range(50,101):
+            buttonColor = green
+            buttonSize = 4
+        pygame.draw.rect(window, buttonColor, (50,50,150,50),buttonSize)
+        playCard = font.render("Play Card", 1, black)
+        window.blit(playCard, (65,65))
 
 if __name__=="__main__":
     main()
