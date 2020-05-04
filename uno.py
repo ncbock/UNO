@@ -16,12 +16,13 @@ def main():
     pygame.init()
     window = pygame.display.set_mode((750,750))
     count = 0
-    round = 0
+    currentRound = 0
+    nextRound = 1
 
     players = getPlayers()
+    hands, deck = createHands(players)
 
     playTurn = 0
-    printOne = 0
     while True:
         player = 0
         pos = pygame.mouse.get_pos()
@@ -44,14 +45,14 @@ def main():
         displayUNO(window,count)
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
-        hands, deck = createHands(players)
+        displayHand(window, players[playTurn], hands, count)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
 
 def createDeck():
     deck = []
-    colors = ["red", "yellow", "green", "blue"]
+    colors = ["red", "gold", "green", "blue"]
     wild = "wild"
     plusFour = "+4"
     actions = ["skip", "reverse", "+2"]
@@ -61,14 +62,14 @@ def createDeck():
             #All other cards have 2 cards per color
             if i < 1:
                 for card in range(10):
-                    deck.append(color + " " + str(card))
+                    deck.append(str(card) + " " + color)
                 deck.append(wild)
             else:
                 for card in range(1,10):
-                    deck.append(color + " " + str(card))
+                    deck.append(str(card) + " " + color)
                 deck.append(plusFour)
             for card in actions:
-                deck.append(color + " " + str(card))
+                deck.append(str(card) + " " + color)
     shuffle(deck)
     return deck
 
@@ -122,7 +123,7 @@ def whoseTurn(window, count, turn, playerList):
         font = pygame.font.SysFont("arial", 45)
         player = playerList[turn]
         playerTurn = font.render("{} it's your turn!".format(player), 1, gold)
-        window.blit(playerTurn,(300,50))
+        window.blit(playerTurn,(215,50))
 
 def playCardButton(window, count):
     if count > 0:
@@ -136,6 +137,35 @@ def playCardButton(window, count):
         pygame.draw.rect(window, buttonColor, (50,50,150,50),buttonSize)
         playCard = font.render("Play Card", 1, black)
         window.blit(playCard, (65,65))
+
+def displayHand(window, player, hand, count):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 35)
+        xstart = 215
+        ystart = 125
+        for cards in hand[player]:
+            currentCard = cards.split(" ")
+            if len(currentCard) == 2:
+                if currentCard[1] == "red":
+                    color = red
+                elif currentCard[1] == "green":
+                    color = green
+                elif currentCard[1] == "blue":
+                    color = blue
+                else:
+                    color = gold
+                playersCard = font.render(currentCard[0],1,color)
+            else:
+                playersCard = font.render(currentCard[0],1,black)
+            text_width, text_height = font.size(currentCard[0])
+            if xstart + text_width < 725:
+                window.blit(playersCard, (xstart,ystart))
+                xstart = xstart + text_width + 15
+            else: 
+                xstart = 215
+                ystart = ystart + text_width + 15
+                window.blit(playersCard, (xstart,ystart))
+
 
 if __name__=="__main__":
     main()
