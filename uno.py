@@ -24,19 +24,26 @@ def main():
 
     playTurn = 0
     while True:
-        player = 0
         pos = pygame.mouse.get_pos()
         for e in pygame.event.get():
+            #Close the window
             if e.type == pygame.QUIT:
                 return
+            #Start the Game
             if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
-                if pos[0] in range(300,451) and pos[1] in range(450,501):
+                if pos[0] in range(300,451) and pos[1] in range(500,551):
                     count += 1
+            #Play the slected Card, this needs expansion
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
                     playTurn += 1
                     if playTurn == len(players):
                         playTurn = 0
+            #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
+            # in the location of the deck. 
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
+                hands[players[playTurn]].append(deck[0])
+                deck.pop(0)
 
 
         #Display all info after this point
@@ -46,6 +53,7 @@ def main():
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
         displayHand(window, players[playTurn], hands, count)
+        drawCards(window, count)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -105,18 +113,24 @@ def startButton(window, count):
         buttonColor = black
         buttonSize = 2
         if pos[0] in range(300,451):
-            if pos[1] in range (450,501):
+            if pos[1] in range (500,551):
                 buttonColor = green
                 buttonSize = 4
-        pygame.draw.rect(window,buttonColor, (300,450,150,50),buttonSize)
+        pygame.draw.rect(window,buttonColor, (300,500,150,50),buttonSize)
         start = font.render("START", 1, black)
-        window.blit(start,(318,458))
+        text_width, text_height = font.size("START")
+        xstart = 300 + ((150 - text_width)/2)
+        ystart = 500 + ((50 - text_height)/2)
+        window.blit(start,(xstart, ystart))
 
 def displayUNO(window, count):
     if count < 1:
         font = pygame.font.SysFont("arial", 200)
         uno= font.render("UNO!", 1, gold)
-        window.blit(uno,(125, 200))
+        text_width, text_height = font.size("UNO!")
+        xstart = (750- text_width)/2
+        ystart = (750 -text_height)/2
+        window.blit(uno,(xstart, ystart))
 
 def whoseTurn(window, count, turn, playerList):
     if count > 0:
@@ -136,7 +150,10 @@ def playCardButton(window, count):
             buttonSize = 4
         pygame.draw.rect(window, buttonColor, (50,50,150,50),buttonSize)
         playCard = font.render("Play Card", 1, black)
-        window.blit(playCard, (65,65))
+        text_width, text_height = font.size("Play Card")
+        xstart = 50 + ((150-text_width)/2)
+        ystart = 50 + ((50-text_height)/2)
+        window.blit(playCard, (xstart, ystart))
 
 def displayHand(window, player, hand, count):
     if count > 0:
@@ -165,6 +182,26 @@ def displayHand(window, player, hand, count):
                 xstart = 215
                 ystart = ystart + text_width + 15
                 window.blit(playersCard, (xstart,ystart))
+
+def drawCards(window, count):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 70)
+        pos = pygame.mouse.get_pos()
+        if pos[0] in range(550,651) and pos[1] in range(275,476):
+            color = green
+            size = 8
+        else:
+            color = black
+            size = 4
+        pygame.draw.rect(window, color, (550,275,100,200), size)
+        text = "UNO!"
+        uno = font.render(text, 1, gold)
+        text_width, text_height = font.size(text)
+        uno = pygame.transform.rotate(uno, 270)
+        xstart = 550 + ((100- text_height)/2) 
+        ystart = 275 + ((200-text_width)/2)
+        window.blit(uno,(xstart, ystart))
+
 
 
 if __name__=="__main__":
