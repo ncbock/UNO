@@ -28,8 +28,10 @@ def main():
         playedPile = deck.pop(0)
 
     playTurn = 0
+
     printOne = 0
 
+    reverse = False
     playerSelect = False
     while True:
         pos = pygame.mouse.get_pos()
@@ -46,30 +48,28 @@ def main():
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
                     if isValidPlay(playedPile, selectedCard, count):
                         playedPile = selectedCard
+                        if "Reverse" in playedPile:
+                            reverse = not reverse
                         cardIndex = hands[players[playTurn]].index(selectedCard)
                         hands[players[playTurn]].pop(cardIndex)
-                        playTurn += 1
-                        if playTurn == len(players):
-                            playTurn = 0
+                        #This will change whose turn it is, it is written multiple time, consider making this a function
+                        playTurn = changePlayer(players, playTurn, reverse)
                         playerSelect = False
             #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
             # in the location of the deck. Count must be greater than 0 for the game to have started
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
                 if isValidPlay(playedPile, deck[0], count):
                     playedPile = deck[0]
+                    if "Reverse" in playedPile:
+                        reverse = not reverse
                     deck.pop(0)
-                    clock.tick(300)
-                    playTurn += 1
-                    if playTurn == len(players):
-                        playTurn = 0
+                    playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                 else:
                     hands[players[playTurn]].append(deck[0])
                     deck.pop(0)
                     clock.tick(300)
-                    playTurn += 1
-                    if playTurn == len(players):
-                        playTurn = 0
+                    playTurn = changePlayer(players, playTurn, reverse)
             
                     
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
@@ -329,6 +329,17 @@ def notValidPlay(window , count):
         xstart = 375 - (text_width/2)
         ystart = 500 + (text_height/2)
         window.blit(message,(xstart,ystart))
+
+def changePlayer(players, playTurn, reverse):
+    if not reverse:
+        playTurn += 1
+        if playTurn == len(players):
+            playTurn = 0
+    else:
+        playTurn -= 1
+        if playTurn < 0:
+            playTurn = len(players) -1
+    return playTurn
 
 
                         
