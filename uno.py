@@ -21,7 +21,11 @@ def main():
 
     players = getPlayers()
     hands, deck = createHands(players)
-    playedPile = deck.pop(0)
+    if deck[0] != "+4":
+        playedPile = deck.pop(0)
+    else:
+        deck.append(deck[0])
+        playedPile = deck.pop(0)
 
     playTurn = 0
     printOne = 0
@@ -40,18 +44,34 @@ def main():
             #Play the slected Card, this needs expansion
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
-                    playedPile = selectedCard
-                    cardIndex = hands[players[playTurn]].index(selectedCard)
-                    hands[players[playTurn]].pop(cardIndex)
+                    if isValidPlay(playedPile, selectedCard, count):
+                        playedPile = selectedCard
+                        cardIndex = hands[players[playTurn]].index(selectedCard)
+                        hands[players[playTurn]].pop(cardIndex)
+                        playTurn += 1
+                        if playTurn == len(players):
+                            playTurn = 0
+                        playerSelect = False
+            #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
+            # in the location of the deck. Count must be greater than 0 for the game to have started
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
+                if isValidPlay(playedPile, deck[0], count):
+                    playedPile = deck[0]
+                    deck.pop(0)
+                    clock.tick(300)
                     playTurn += 1
                     if playTurn == len(players):
                         playTurn = 0
                     playerSelect = False
-            #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
-            # in the location of the deck. Count must be greater than 0 for the game to have started
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
-                hands[players[playTurn]].append(deck[0])
-                deck.pop(0)
+                else:
+                    hands[players[playTurn]].append(deck[0])
+                    deck.pop(0)
+                    clock.tick(300)
+                    playTurn += 1
+                    if playTurn == len(players):
+                        playTurn = 0
+            
+                    
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
                 if cardLocations != None:
                     for cards in cardLocations:
@@ -62,13 +82,8 @@ def main():
                                 ystart = cardLocations[cards][1] - 5
                                 height = cardLocations[cards][2] + 10
                                 width = cardLocations[cards][3] + 10
-                                selectedCard = str(cards)
+                                selectedCard = cards
 
-                                
-            
-
-                
-                
         #Display all info after this point
         window.fill(white)
         startButton(window,count)
@@ -88,9 +103,9 @@ def main():
 def createDeck():
     deck = []
     colors = ["red", "gold", "green", "blue"]
-    wild = "wild"
+    wild = "Wild"
     plusFour = "+4"
-    actions = ["skip", "reverse", "+2"]
+    actions = ["Skip", "Reverse", "+2"]
     for i in range(2):
         for color in colors:
             #There is only 1 "0" card per color, 4 wild cards, and 4 "+4 cards" in the deck
@@ -291,7 +306,29 @@ def cardsPlayed(window, count, card):
         ystart = 275 +((200-text_height)/2)
         window.blit(playersCard,(xstart,ystart))
 
+def isValidPlay(pileCard, selectedCard, count):
+    if count > 0:
+        # print(type(pileCard))
+        # print(type(selectedCard))
+        playedCard = pileCard.split(" ")
+        wantToPlay = selectedCard.split(" ")
+        if selectedCard == "Wild" or selectedCard == "+4" or pileCard == "Wild" or pileCard == "+4":
+            return True
+        if len(playedCard) == len(wantToPlay):
+            if wantToPlay[0] == playedCard[0] or wantToPlay[1] == playedCard[1]:
+                return True
+        return False
+        
 
+def notValidPlay(window , count):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 40)
+        text = "That is not a Valid Play, Please choose another card"
+        text_width, text_height = font.size(text)
+        message = font.render(text,1,black)
+        xstart = 375 - (text_width/2)
+        ystart = 500 + (text_height/2)
+        window.blit(message,(xstart,ystart))
 
 
                         
