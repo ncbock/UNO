@@ -21,7 +21,6 @@ def main():
 
     players = getPlayers()
     hands, deck = createHands(players)
-    print(deck)
     playedPile = deck.pop(0)
 
     playTurn = 0
@@ -41,11 +40,13 @@ def main():
             #Play the slected Card, this needs expansion
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
+                    playedPile = selectedCard
+                    cardIndex = hands[players[playTurn]].index(selectedCard)
+                    hands[players[playTurn]].pop(cardIndex)
                     playTurn += 1
                     if playTurn == len(players):
                         playTurn = 0
                     playerSelect = False
-                    playedPile = selectedCard
             #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
             # in the location of the deck. Count must be greater than 0 for the game to have started
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
@@ -61,7 +62,9 @@ def main():
                                 ystart = cardLocations[cards][1] - 5
                                 height = cardLocations[cards][2] + 10
                                 width = cardLocations[cards][3] + 10
-                                selectedCard = cards
+                                selectedCard = str(cards)
+
+                                
             
 
                 
