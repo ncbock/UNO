@@ -52,7 +52,18 @@ def main():
                             reverse = not reverse
                         cardIndex = hands[players[playTurn]].index(selectedCard)
                         hands[players[playTurn]].pop(cardIndex)
-                        #This will change whose turn it is, it is written multiple time, consider making this a function
+                        if "+2" in playedPile:
+                            nextPlayer = changePlayer(players, playTurn, reverse)
+                            for i in range(2):
+                                hands[players[nextPlayer]].append(deck[0])
+                                deck.pop(0)
+                        if "+4" in playedPile:
+                            nextPlayer = changePlayer(players, playTurn, reverse)
+                            for i in range (4):
+                                hands[players[nextPlayer]].append(deck[0])
+                                deck.pop(0)
+                        if "Skip" in playedPile:
+                            playTurn = changePlayer(players, playTurn, reverse)
                         playTurn = changePlayer(players, playTurn, reverse)
                         playerSelect = False
             #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
@@ -63,6 +74,18 @@ def main():
                     if "Reverse" in playedPile:
                         reverse = not reverse
                     deck.pop(0)
+                    if "+2" in playedPile:
+                            nextPlayer = changePlayer(players, playTurn, reverse)
+                            for i in range(2):
+                                hands[players[nextPlayer]].append(deck[0])
+                                deck.pop(0)
+                    if "+4" in playedPile:
+                        nextPlayer = changePlayer(players, playTurn, reverse)
+                        for i in range (4):
+                            hands[players[nextPlayer]].append(deck[0])
+                            deck.pop(0)
+                    if "Skip" in playedPile:
+                            playTurn = changePlayer(players, playTurn, reverse)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                 else:
@@ -70,6 +93,7 @@ def main():
                     deck.pop(0)
                     clock.tick(300)
                     playTurn = changePlayer(players, playTurn, reverse)
+                    playerSelect = False
             
                     
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
@@ -319,7 +343,6 @@ def isValidPlay(pileCard, selectedCard, count):
                 return True
         return False
         
-
 def notValidPlay(window , count):
     if count > 0:
         font = pygame.font.SysFont("arial", 40)
@@ -340,11 +363,6 @@ def changePlayer(players, playTurn, reverse):
         if playTurn < 0:
             playTurn = len(players) -1
     return playTurn
-
-
-                        
-
-
 
 if __name__=="__main__":
     main()
