@@ -425,11 +425,19 @@ def updateScores(hands):
 def hideCards(window, count, showHand):
     if count > 0:
         font = pygame.font.SysFont("arial",25)
-        pygame.draw.rect(window, black, (50, 110, 150, 50),2)
+        pos = pygame.mouse.get_pos()
         if showHand:
             text = "Hide Hand"
         else:
             text = "Show Hand"
+        if pos[0] in range(50,201) and pos[1] in range(110,161):
+            buttonColor = green
+            buttonSize = 4
+        else:
+            buttonColor = black
+            buttonSize = 2
+
+        pygame.draw.rect(window, buttonColor, (50, 110, 150, 50), buttonSize)
         text_width, text_height = font.size(text)
         message = font.render(text,1,black)
         xstart = 50 + ((150-text_width)/2)
