@@ -21,6 +21,11 @@ def main():
 
     players = getPlayers()
     hands, deck = createHands(players)
+    scores = []
+
+    for i in range(len(players)):
+        scores.append(0)
+    
     if deck[0] != "+4":
         playedPile = deck.pop(0)
     else:
@@ -28,8 +33,6 @@ def main():
         playedPile = deck.pop(0)
 
     playTurn = 0
-
-    printOne = 0
 
     reverse = False
     playerSelect = False
@@ -43,7 +46,7 @@ def main():
             if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
                 if pos[0] in range(300,451) and pos[1] in range(500,551):
                     count += 1
-            #Play the slected Card, this needs expansion
+            #Play the slected Card
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
                     if isValidPlay(playedPile, selectedCard, count):
@@ -64,11 +67,13 @@ def main():
                                 deck.pop(0)
                         if "Skip" in playedPile:
                             playTurn = changePlayer(players, playTurn, reverse)
+                        wait = pygame.time.delay(2000)
                         playTurn = changePlayer(players, playTurn, reverse)
                         playerSelect = False
             #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
             # in the location of the deck. Count must be greater than 0 for the game to have started
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
+                # If the card drawn can be played it must be played and not added to the current players hand
                 if isValidPlay(playedPile, deck[0], count):
                     playedPile = deck[0]
                     if "Reverse" in playedPile:
@@ -86,12 +91,13 @@ def main():
                             deck.pop(0)
                     if "Skip" in playedPile:
                             playTurn = changePlayer(players, playTurn, reverse)
+                    wait = pygame.time.delay(2000)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                 else:
                     hands[players[playTurn]].append(deck[0])
                     deck.pop(0)
-                    clock.tick(300)
+                    wait = pygame.time.delay(2000)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
             
@@ -118,6 +124,13 @@ def main():
         hovered = hoverBox(window, count, cardLocations)
         if playerSelect:
             pygame.draw.rect(window,black,(xstart,ystart,height,width),2)
+        if roundWinner(hands):
+            winnerIndex = players.index(roundWinner(hands)[1])
+            roundScore = updateScores(hands)
+            scores[winnerIndex] += roundScore
+            print(hands)
+            hands, deck = createHands(players)
+        displayScores(window, count, players, scores)
         cardsPlayed(window, count, playedPile)
         drawCards(window, count)
         #Update the Display
@@ -363,6 +376,37 @@ def changePlayer(players, playTurn, reverse):
         if playTurn < 0:
             playTurn = len(players) -1
     return playTurn
+
+def displayScores(window, count, players, scores):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 40)
+        for i in range(len(players)):
+            text = "{}: {}".format(players[i], scores[i])
+            text_width, text_height = font.size(text)
+            message = font.render(text, 1 , black)
+            xstart = 50
+            ystart = 700 -(text_height * i) - (i * 5)
+            window.blit(message,(xstart, ystart))
+
+
+def roundWinner(hands):
+    for player in hands:
+        if len(hands[player]) == 0:
+            return True, player
+
+def updateScores(hands):
+    roundScore = 0
+    for players in hands:
+        for cards in hands[players]:
+            if ("+2" in cards) or ("Reverse" in cards) or  ("skip" in cards):
+                roundScore += 20
+            elif ("Wild" in cards) or ("+4" in cards):
+                roundScore += 50
+            else:
+                points = int(cards[0])
+                roundScore += points
+    return roundScore
+
 
 if __name__=="__main__":
     main()
