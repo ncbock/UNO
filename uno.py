@@ -36,16 +36,21 @@ def main():
 
     reverse = False
     playerSelect = False
+
+    showHand = False
+
     while True:
         pos = pygame.mouse.get_pos()
         for e in pygame.event.get():
             #Close the window
             if e.type == pygame.QUIT:
                 return
+
             #Start the Game
             if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
                 if pos[0] in range(300,451) and pos[1] in range(500,551):
                     count += 1
+
             #Play the slected Card
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
                 if pos[0] in range(50,201) and pos[1] in range(50,101):
@@ -70,6 +75,9 @@ def main():
                         wait = pygame.time.delay(2000)
                         playTurn = changePlayer(players, playTurn, reverse)
                         playerSelect = False
+                        showHand = False
+
+
             #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
             # in the location of the deck. Count must be greater than 0 for the game to have started
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
@@ -94,15 +102,17 @@ def main():
                     wait = pygame.time.delay(2000)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
+                    showHand = False
                 else:
                     hands[players[playTurn]].append(deck[0])
                     deck.pop(0)
                     wait = pygame.time.delay(2000)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
+                    showHand = False
             
-                    
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
+            # Draw a rectangle around a selected card        
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and showHand:
                 if cardLocations != None:
                     for cards in cardLocations:
                         if pos[0] in range(cardLocations[cards][0], (cardLocations[cards][0] + cardLocations[cards][2] +1)):
@@ -113,6 +123,10 @@ def main():
                                 height = cardLocations[cards][2] + 10
                                 width = cardLocations[cards][3] + 10
                                 selectedCard = cards
+            
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
+                if pos[0] in range(50,151) and pos[1] in range(110,161):
+                    showHand = not showHand
 
         #Display all info after this point
         window.fill(white)
@@ -120,8 +134,10 @@ def main():
         displayUNO(window,count)
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
-        cardLocations = displayHand(window, players[playTurn], hands, count)
-        hovered = hoverBox(window, count, cardLocations)
+        if showHand:
+            cardLocations = displayHand(window, players[playTurn], hands, count)
+            hovered = hoverBox(window, count, cardLocations)
+        hideCards(window, count, showHand)
         if playerSelect:
             pygame.draw.rect(window,black,(xstart,ystart,height,width),2)
         if roundWinner(hands):
@@ -388,7 +404,6 @@ def displayScores(window, count, players, scores):
             ystart = 700 -(text_height * i) - (i * 5)
             window.blit(message,(xstart, ystart))
 
-
 def roundWinner(hands):
     for player in hands:
         if len(hands[player]) == 0:
@@ -406,6 +421,20 @@ def updateScores(hands):
                 points = int(cards[0])
                 roundScore += points
     return roundScore
+
+def hideCards(window, count, showHand):
+    if count > 0:
+        font = pygame.font.SysFont("arial",25)
+        pygame.draw.rect(window, black, (50, 110, 150, 50),2)
+        if showHand:
+            text = "Hide Hand"
+        else:
+            text = "Show Hand"
+        text_width, text_height = font.size(text)
+        message = font.render(text,1,black)
+        xstart = 50 + ((150-text_width)/2)
+        ystart = 110 + ((50 -text_height)/2)
+        window.blit(message,(xstart,ystart))
 
 
 if __name__=="__main__":
