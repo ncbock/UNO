@@ -16,28 +16,34 @@ clock = pygame.time.Clock()
 def main():
     pygame.init()
     window = pygame.display.set_mode((750,750))
+    pygame.display.set_caption("UNO!")
     count = 0
-    currentRound = 0
-    nextRound = 1
 
     players = getPlayers()
     hands, deck = createHands(players)
     scores = []
 
+    #Set each players initial score to 0
     for i in range(len(players)):
         scores.append(0)
-    
+
+    #First Discard card can not be a Draw 4 card
     if deck[0] != "+4":
         playedPile = deck.pop(0)
     else:
         deck.append(deck[0])
         playedPile = deck.pop(0)
 
+    #playTurn tracks whose turn it is.
     playTurn = 0
 
+    #Has a reverse been played
     reverse = False
+
+    #Has the current player selected a Card
     playerSelect = False
 
+    #Hide the players hands so others playing will not see it.
     showHand = False
 
     while True:
@@ -100,14 +106,14 @@ def main():
                             deck.pop(0)
                     if "Skip" in playedPile:
                             playTurn = changePlayer(players, playTurn, reverse)
-                    wait = pygame.time.delay(2000)
+                    wait = pygame.time.delay(500)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                     showHand = False
                 else:
                     hands[players[playTurn]].append(deck[0])
                     deck.pop(0)
-                    wait = pygame.time.delay(2000)
+                    wait = pygame.time.delay(500)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                     showHand = False
@@ -124,11 +130,13 @@ def main():
                                 height = cardLocations[cards][2] + 10
                                 width = cardLocations[cards][3] + 10
                                 selectedCard = cards
-            
+
+            #Show the players hand when they want to and hide it if they choose to
             if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
                 if pos[0] in range(50,151) and pos[1] in range(110,161):
                     showHand = not showHand
 
+            #Open the rules of the game.
             if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count) == green:
                 print('I am getting here')
                 open("https://service.mattel.com/instruction_sheets/42001pr.pdf")
@@ -140,6 +148,8 @@ def main():
         rulesButton(window, count)
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
+        playerHasUNO(hands)
+        print(playerHasUNO(hands))
         if showHand:
             cardLocations = displayHand(window, players[playTurn], hands, count)
             hovered = hoverBox(window, count, cardLocations)
@@ -198,7 +208,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(7):
+    for i in range(1):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -464,6 +474,15 @@ def rulesButton(window, count):
         ystart = buttonPosition[1] + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
         return buttonColor
+
+def playerHasUNO(hands):
+    hasUNO = []
+    for player in hands:
+        if len(hands[player]) == 1:
+            hasUNO.append(player)
+    if len(hasUNO) >= 1:
+        return True, hasUNO
+        
 
 if __name__=="__main__":
     main()
