@@ -54,117 +54,105 @@ def main():
                 return
 
             #Start the Game
-            if e.type == pygame.MOUSEBUTTONDOWN and count < 1:
-                if pos[0] in range(300,451) and pos[1] in range(500,551):
-                    count += 1
+            if e.type == pygame.MOUSEBUTTONDOWN and startButton(window, count, pos) == green:
+                count += 1
 
             #Play the slected Card
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 :
-                if pos[0] in range(50,201) and pos[1] in range(50,101):
-                    if isValidPlay(playedPile, selectedCard, count):
-                        playedPile = selectedCard
-                        if "Reverse" in playedPile:
-                            reverse = not reverse
-                        cardIndex = hands[players[playTurn]].index(selectedCard)
-                        hands[players[playTurn]].pop(cardIndex)
-                        if "+2" in playedPile:
-                            nextPlayer = changePlayer(players, playTurn, reverse)
-                            for i in range(2):
-                                hands[players[nextPlayer]].append(deck[0])
-                                deck.pop(0)
-                        if "+4" in playedPile:
-                            nextPlayer = changePlayer(players, playTurn, reverse)
-                            for i in range (4):
-                                hands[players[nextPlayer]].append(deck[0])
-                                deck.pop(0)
-                        if "Skip" in playedPile:
-                            playTurn = changePlayer(players, playTurn, reverse)
-                        wait = pygame.time.delay(2000)
-                        playTurn = changePlayer(players, playTurn, reverse)
-                        playerSelect = False
-                        showHand = False
-
-
-            #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
-            # in the location of the deck. Count must be greater than 0 for the game to have started
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and pos[0] in range(550,651) and pos[1] in range(275,476):
-                # If the card drawn can be played it must be played and not added to the current players hand
-                if isValidPlay(playedPile, deck[0], count):
-                    playedPile = deck[0]
+            if e.type == pygame.MOUSEBUTTONDOWN and playCardButton(window, count, pos) == green:
+                if isValidPlay(playedPile, selectedCard, count):
+                    playedPile = selectedCard
                     if "Reverse" in playedPile:
                         reverse = not reverse
-                    deck.pop(0)
+                    cardIndex = hands[players[playTurn]].index(selectedCard)
+                    hands[players[playTurn]].pop(cardIndex)
                     if "+2" in playedPile:
-                            nextPlayer = changePlayer(players, playTurn, reverse)
-                            for i in range(2):
-                                hands[players[nextPlayer]].append(deck[0])
-                                deck.pop(0)
+                        nextPlayer = changePlayer(players, playTurn, reverse)
+                        for i in range(2):
+                            hands[players[nextPlayer]].append(deck[0])
+                            deck.pop(0)
                     if "+4" in playedPile:
                         nextPlayer = changePlayer(players, playTurn, reverse)
                         for i in range (4):
                             hands[players[nextPlayer]].append(deck[0])
                             deck.pop(0)
                     if "Skip" in playedPile:
+                        playTurn = changePlayer(players, playTurn, reverse)
+                    wait = pygame.time.delay(2000)
+                    playTurn = changePlayer(players, playTurn, reverse)
+                    playerSelect = False
+                    showHand = False
+
+
+            #Add a card to the players hand when they draw a card, drawing a card is signaled by the mouse click event
+            # in the location of the deck. Count must be greater than 0 for the game to have started
+            if e.type == pygame.MOUSEBUTTONDOWN and drawCards(window, count, pos) == green:
+                # If the card drawn can be played it must be played and not added to the current players hand
+                if isValidPlay(playedPile, deck[0], count):
+                    playedPile = deck[0]
+                    if "Reverse" in playedPile:
+                        reverse = not reverse
+                    deck.pop(0)
+                    nextPlayer = changePlayer(players, playTurn, reverse)
+                    if "+2" in playedPile:
+                        for i in range(2):
+                            hands[players[nextPlayer]].append(deck[0])
+                            deck.pop(0)
+                    if "+4" in playedPile:
+                        for i in range (4):
+                            hands[players[nextPlayer]].append(deck[0])
+                            deck.pop(0)
+                    if "Skip" in playedPile:
                             playTurn = changePlayer(players, playTurn, reverse)
-                    wait = pygame.time.delay(500)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                     showHand = False
                 else:
                     hands[players[playTurn]].append(deck[0])
                     deck.pop(0)
-                    wait = pygame.time.delay(500)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                     showHand = False
             
-            # Draw a rectangle around a selected card        
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and showHand:
-                if cardLocations != None:
-                    for cards in cardLocations:
-                        if pos[0] in range(cardLocations[cards][0], (cardLocations[cards][0] + cardLocations[cards][2] +1)):
-                            if pos[1] in range(cardLocations[cards][1], (cardLocations[cards][1] + cardLocations[cards][3] + 1)):
-                                playerSelect = True
-                                xstart = cardLocations[cards][0] - 5
-                                ystart = cardLocations[cards][1] - 5
-                                height = cardLocations[cards][2] + 10
-                                width = cardLocations[cards][3] + 10
-                                selectedCard = cards
+            # Create the Selected card and the location of the Selected Card     
+            if e.type == pygame.MOUSEBUTTONDOWN and count > 0 and showHand and hoverBox(window, count, cardLocations, pos):
+                playerSelect = True
+                boxLocation = hoverBox(window, count, cardLocations, pos)[2]
+                selectedCard = hoverBox(window, count, cardLocations, pos)[1]
 
             #Show the players hand when they want to and hide it if they choose to
-            if e.type == pygame.MOUSEBUTTONDOWN and count > 0:
+            if e.type == pygame.MOUSEBUTTONDOWN and hideCards(window, count, showHand, pos) == green:
                 if pos[0] in range(50,151) and pos[1] in range(110,161):
                     showHand = not showHand
+                    playerSelect = False
 
             #Open the rules of the game.
-            if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count) == green:
-                print('I am getting here')
+            if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count, pos) == green:
                 open("https://service.mattel.com/instruction_sheets/42001pr.pdf")
 
         #Display all info after this point
         window.fill(white)
-        startButton(window,count)
+        startButton(window,count, pos)
         displayUNO(window,count)
-        rulesButton(window, count)
+        rulesButton(window, count, pos)
         whoseTurn(window, count, playTurn, players)
-        playCardButton(window,count)
-        playerHasUNO(hands)
-        print(playerHasUNO(hands))
+        playCardButton(window,count, pos)      
         if showHand:
             cardLocations = displayHand(window, players[playTurn], hands, count)
-            hovered = hoverBox(window, count, cardLocations)
-        hideCards(window, count, showHand)
+            hoverBox(window, count, cardLocations, pos)
+        hideCards(window, count, showHand, pos)
         if playerSelect:
-            pygame.draw.rect(window,black,(xstart,ystart,height,width),2)
+            #Draw a rectangle when the player selects a card
+            pygame.draw.rect(window,black, boxLocation,2)
         if roundWinner(hands):
             winnerIndex = players.index(roundWinner(hands)[1])
             roundScore = updateScores(hands)
             scores[winnerIndex] += roundScore
+            # need to see if a player has reached 500 points
             print(hands)
             hands, deck = createHands(players)
         displayScores(window, count, players, scores)
         cardsPlayed(window, count, playedPile)
-        drawCards(window, count)
+        drawCards(window, count, pos)
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -208,7 +196,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(1):
+    for i in range(7):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -217,9 +205,8 @@ def createHands(players):
 
     return currentHands, deck
     
-def startButton(window, count):
+def startButton(window, count, pos):
     font = pygame.font.SysFont("arial", 35)
-    pos = pygame.mouse.get_pos()
     if count < 1:
         buttonColor = black
         buttonSize = 2
@@ -233,6 +220,7 @@ def startButton(window, count):
         xstart = 300 + ((150 - text_width)/2)
         ystart = 500 + ((50 - text_height)/2)
         window.blit(start,(xstart, ystart))
+        return buttonColor
 
 def displayUNO(window, count):
     if count < 1:
@@ -250,10 +238,9 @@ def whoseTurn(window, count, turn, playerList):
         playerTurn = font.render("{} it's your turn!".format(player), 1, gold)
         window.blit(playerTurn,(215,50))
 
-def playCardButton(window, count):
+def playCardButton(window, count, pos):
     if count > 0:
         font = pygame.font.SysFont("arial",30)
-        pos = pygame.mouse.get_pos()
         buttonColor = black
         buttonSize = 2
         if pos[0] in range(50,201) and pos[1] in range(50,101):
@@ -265,6 +252,7 @@ def playCardButton(window, count):
         xstart = 50 + ((150-text_width)/2)
         ystart = 50 + ((50-text_height)/2)
         window.blit(playCard, (xstart, ystart))
+        return buttonColor
 
 def displayHand(window, player, hand, count):
     if count > 0:
@@ -316,10 +304,9 @@ def displayHand(window, player, hand, count):
         # Return the cardLocations so that we will be able to identify when a card is being slected or hovered over.
         return cardLocations
 
-def drawCards(window, count):
+def drawCards(window, count, pos):
     if count > 0:
         font = pygame.font.SysFont("arial", 70)
-        pos = pygame.mouse.get_pos()
         if pos[0] in range(550,651) and pos[1] in range(275,476):
             color = green
             size = 8
@@ -334,10 +321,10 @@ def drawCards(window, count):
         xstart = 550 + ((100- text_height)/2) 
         ystart = 275 + ((200-text_width)/2)
         window.blit(uno,(xstart, ystart))
+        return color
 
-def hoverBox(window, count, locations):
+def hoverBox(window, count, locations, pos):
     if count > 0:
-        pos = pygame.mouse.get_pos()
         for cards in locations:
             xstart = locations[cards][0]
             ystart = locations[cards][1]
@@ -348,6 +335,8 @@ def hoverBox(window, count, locations):
                 if pos[1] in range (ystart, (ystart + height + 1)):
                     pygame.draw.rect(window,black, boxLocation, 2)
                     return True, cards, boxLocation
+                else:
+                    return False
 
 def cardsPlayed(window, count, card):
     if count > 0:
@@ -419,7 +408,7 @@ def updateScores(hands):
     roundScore = 0
     for players in hands:
         for cards in hands[players]:
-            if ("+2" in cards) or ("Reverse" in cards) or  ("skip" in cards):
+            if ("+2" in cards) or ("Reverse" in cards) or  ("Skip" in cards):
                 roundScore += 20
             elif ("Wild" in cards) or ("+4" in cards):
                 roundScore += 50
@@ -428,10 +417,9 @@ def updateScores(hands):
                 roundScore += points
     return roundScore
 
-def hideCards(window, count, showHand):
+def hideCards(window, count, showHand, pos):
     if count > 0:
         font = pygame.font.SysFont("arial",25)
-        pos = pygame.mouse.get_pos()
         if showHand:
             text = "Hide Hand"
         else:
@@ -449,13 +437,13 @@ def hideCards(window, count, showHand):
         xstart = 50 + ((150-text_width)/2)
         ystart = 110 + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
+        return buttonColor
 
-def rulesButton(window, count):
+def rulesButton(window, count, pos):
         font = pygame.font.SysFont("arial",30)
-        pos = pygame.mouse.get_pos()
         text = "Rules"
         if count > 0:
-            buttonPosition = (575, 25, 150, 50)
+            buttonPosition = (575, 675, 150, 50)
         else:
             buttonPosition = (300,560,150,50)
 
@@ -476,10 +464,11 @@ def rulesButton(window, count):
         return buttonColor
 
 def playerHasUNO(hands):
-    hasUNO = []
+    hasUNO = {}
     for player in hands:
         if len(hands[player]) == 1:
-            hasUNO.append(player)
+            #we will update the condition to True when the player calls UNO. To start it will be False.
+            hasUNO[player] = False
     if len(hasUNO) >= 1:
         return True, hasUNO
         
