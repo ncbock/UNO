@@ -1,5 +1,6 @@
 import pygame
 from random import shuffle
+from webbrowser import open
 
 #RGB Colors
 white = (255, 255, 255)
@@ -128,10 +129,15 @@ def main():
                 if pos[0] in range(50,151) and pos[1] in range(110,161):
                     showHand = not showHand
 
+            if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count) == green:
+                print('I am getting here')
+                open("https://service.mattel.com/instruction_sheets/42001pr.pdf")
+
         #Display all info after this point
         window.fill(white)
         startButton(window,count)
         displayUNO(window,count)
+        rulesButton(window, count)
         whoseTurn(window, count, playTurn, players)
         playCardButton(window,count)
         if showHand:
@@ -371,16 +377,6 @@ def isValidPlay(pileCard, selectedCard, count):
             if wantToPlay[0] == playedCard[0] or wantToPlay[1] == playedCard[1]:
                 return True
         return False
-        
-def notValidPlay(window , count):
-    if count > 0:
-        font = pygame.font.SysFont("arial", 40)
-        text = "That is not a Valid Play, Please choose another card"
-        text_width, text_height = font.size(text)
-        message = font.render(text,1,black)
-        xstart = 375 - (text_width/2)
-        ystart = 500 + (text_height/2)
-        window.blit(message,(xstart,ystart))
 
 def changePlayer(players, playTurn, reverse):
     if not reverse:
@@ -444,6 +440,30 @@ def hideCards(window, count, showHand):
         ystart = 110 + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
 
+def rulesButton(window, count):
+        font = pygame.font.SysFont("arial",30)
+        pos = pygame.mouse.get_pos()
+        text = "Rules"
+        if count > 0:
+            buttonPosition = (575, 25, 150, 50)
+        else:
+            buttonPosition = (300,560,150,50)
+
+        buttonColor = black
+        buttonSize = 2
+
+        if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+            if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                buttonColor = green
+                buttonSize = 4
+
+        pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+        text_width, text_height = font.size(text)
+        message = font.render(text,1,black)
+        xstart = buttonPosition[0] + ((150-text_width)/2)
+        ystart = buttonPosition[1] + ((50 -text_height)/2)
+        window.blit(message,(xstart,ystart))
+        return buttonColor
 
 if __name__=="__main__":
     main()
