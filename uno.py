@@ -72,8 +72,6 @@ def main():
                     if len(hands[players[playTurn]]) == 1:
                         if callUNOButton(window):
                             calledUNO.append(players[playTurn])
-                            print(calledUNO)
-                        
                     if "+2" in playedPile:
                         nextPlayer = changePlayer(players, playTurn, reverse)
                         for i in range(2):
@@ -163,6 +161,13 @@ def main():
         displayScores(window, count, players, scores, hands)
         cardsPlayed(window, count, playedPile)
         drawCards(window, count, pos)
+        currentUNOHands = playerHasUNO(hands)
+        # remove the players uno call if he no longer has uno
+        if len(calledUNO) != 0:
+            for player in calledUNO:
+                if player not in currentUNOHands:
+                    calledUNO.pop(calledUNO.index(player))     
+
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -507,8 +512,6 @@ def callUNOButton(window):
                 return True
         pygame.display.update()
             # return buttonColor
-
-        
 
 if __name__=="__main__":
     main()
