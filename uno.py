@@ -141,7 +141,8 @@ def main():
         displayUNO(window,count)
         rulesButton(window, count, pos)
         whoseTurn(window, count, playTurn, players)
-        playCardButton(window,count, pos)      
+        playCardButton(window,count, pos)    
+        opponentUNOButton(window, count, pos)  
         if showHand:
             cardLocations = displayHand(window, players[playTurn], hands, count)
             hoverBox(window, count, cardLocations, pos)
@@ -154,7 +155,6 @@ def main():
             roundScore = updateScores(hands)
             scores[winnerIndex] += roundScore
             # need to see if a player has reached 500 points
-            print(hands)
             #create new Hands and empty the Called UNO list
             hands, deck = createHands(players)
             calledUNO = []
@@ -166,8 +166,8 @@ def main():
         if len(calledUNO) != 0:
             for player in calledUNO:
                 if player not in currentUNOHands:
-                    calledUNO.pop(calledUNO.index(player))     
-
+                    calledUNO.pop(calledUNO.index(player))
+        
         #Update the Display
         pygame.display.update()
         clock.tick(60)
@@ -512,6 +512,27 @@ def callUNOButton(window):
                 return True
         pygame.display.update()
             # return buttonColor
+
+def opponentUNOButton(window, count, pos):
+    if count > 0:
+        font = pygame.font.SysFont("arial", 30)
+        text = "Call Out"
+        buttonColor = black
+        buttonSize = 2
+        buttonPosition = (50, 170, 150, 50)
+        if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+            if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                buttonColor = green
+                buttonSize = 4
+
+        pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+        text_width, text_height = font.size(text)
+        message = font.render(text,1, black)
+        xstart = buttonPosition[0] + ((150-text_width)/2)
+        ystart = buttonPosition[1] + ((50 -text_height)/2)
+        window.blit(message,(xstart,ystart))
+
+
 
 if __name__=="__main__":
     main()
