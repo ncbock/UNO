@@ -25,7 +25,7 @@ def main():
 
     #Set each players initial score to 0
     for i in range(len(players)):
-        scores.append(499)
+        scores.append(0)
 
     #First Discard card can not be a Draw 4 card
     if deck[0] != "+4":
@@ -143,7 +143,11 @@ def main():
                         for i in range(4):
                             hands[player].append(deck[0])
                             deck.pop(0)
-                            
+
+            #Quit the game
+            if e.type == pygame.MOUSEBUTTONDOWN and quitButton(window, pos, count, gameWon) == green:
+                return
+
             # Restart the game
             if e.type == pygame.MOUSEBUTTONDOWN and playAgain(window, pos) == green:
                 gameWon = False
@@ -151,7 +155,7 @@ def main():
                 hands, deck = createHands(players)
                 scores = []
                 for i in range(len(players)):
-                    scores.append(499)
+                    scores.append(0)
                 if deck[0] != "+4":
                     playedPile = deck.pop(0)
                 else:
@@ -171,6 +175,7 @@ def main():
         if not gameWon:
             window.fill(white)
             startButton(window,count, pos)
+            quitButton(window, pos, count, gameWon)
             displayUNO(window,count)
             rulesButton(window, count, pos)
             whoseTurn(window, count, playTurn, players)
@@ -210,6 +215,7 @@ def main():
             window.fill(white)
             printWinner(window, players, scores)
             playAgain(window, pos)
+            quitButton(window, pos, count, gameWon)
 
         
         #Update the Display
@@ -255,7 +261,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(1):
+    for i in range(7):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -610,6 +616,30 @@ def playAgain(window, pos):
     buttonColor = black
     buttonSize = 2
     buttonPosition = (300, 420, 150, 50)
+    if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+            if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                buttonColor = green
+                buttonSize = 4
+    pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+    text_width, text_height =font.size(text)
+    message = font.render(text,1, black)
+    xstart = buttonPosition[0] + ((150-text_width)/2)
+    ystart = buttonPosition[1] + ((50 -text_height)/2)
+    window.blit(message,(xstart,ystart))
+    return buttonColor
+
+def quitButton(window, pos, count, gameWon):
+    font = pygame.font.SysFont("arial",30)
+    text = "Quit"
+    buttonColor = black
+    buttonSize = 2
+    if count == 0:
+        buttonPosition = (300,620,150,50)
+    elif gameWon:
+        buttonPosition = (300, 480, 150, 50)
+    else:
+        buttonPosition = (575, 615, 150, 50)
+    
     if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
             if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
                 buttonColor = green
