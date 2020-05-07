@@ -131,8 +131,19 @@ def main():
                     showHand = not showHand
                     playerSelect = False
 
+            # Capture the players UNO Call when their turn comes back around
             if e.type == pygame.MOUSEBUTTONDOWN and callUNOButtonPerm(window, pos) == green:
                 calledUNO.append(players[playTurn])
+            
+            # Add cards to players who have not called UNO when called out.
+            if e.type == pygame.MOUSEBUTTONDOWN and opponentUNOButton(window, count, pos) == green:
+                for player in currentUNOHands:
+                    print(currentUNOHands)
+                    print(calledUNO)
+                    if player not in calledUNO:
+                        for i in range(4):
+                            hands[player].append(deck[0])
+                            deck.pop(0)
 
             #Open the rules of the game.
             if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count, pos) == green:
@@ -556,6 +567,7 @@ def opponentUNOButton(window, count, pos):
         xstart = buttonPosition[0] + ((150-text_width)/2)
         ystart = buttonPosition[1] + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
+        return buttonColor
 
 if __name__=="__main__":
     main()
