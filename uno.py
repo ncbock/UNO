@@ -1,4 +1,5 @@
 import pygame
+from time import time 
 from random import shuffle
 from webbrowser import open
 
@@ -46,6 +47,9 @@ def main():
     #Hide the players hands so others playing will not see it.
     showHand = False
 
+    #players who have UNO and have called it.
+    calledUNO = []
+
     while True:
         pos = pygame.mouse.get_pos()
         for e in pygame.event.get():
@@ -65,6 +69,11 @@ def main():
                         reverse = not reverse
                     cardIndex = hands[players[playTurn]].index(selectedCard)
                     hands[players[playTurn]].pop(cardIndex)
+                    if len(hands[players[playTurn]]) == 1:
+                        if callUNOButton(window):
+                            calledUNO.append(players[playTurn])
+                            print(calledUNO)
+                        
                     if "+2" in playedPile:
                         nextPlayer = changePlayer(players, playTurn, reverse)
                         for i in range(2):
@@ -77,7 +86,6 @@ def main():
                             deck.pop(0)
                     if "Skip" in playedPile:
                         playTurn = changePlayer(players, playTurn, reverse)
-                    wait = pygame.time.delay(2000)
                     playTurn = changePlayer(players, playTurn, reverse)
                     playerSelect = False
                     showHand = False
@@ -149,8 +157,10 @@ def main():
             scores[winnerIndex] += roundScore
             # need to see if a player has reached 500 points
             print(hands)
+            #create new Hands and empty the Called UNO list
             hands, deck = createHands(players)
-        displayScores(window, count, players, scores)
+            calledUNO = []
+        displayScores(window, count, players, scores, hands)
         cardsPlayed(window, count, playedPile)
         drawCards(window, count, pos)
         #Update the Display
@@ -196,7 +206,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(7):
+    for i in range(2):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -388,11 +398,12 @@ def changePlayer(players, playTurn, reverse):
             playTurn = len(players) -1
     return playTurn
 
-def displayScores(window, count, players, scores):
+def displayScores(window, count, players, scores, hands):
     if count > 0:
-        font = pygame.font.SysFont("arial", 40)
+        font = pygame.font.SysFont("arial", 30)
         for i in range(len(players)):
-            text = "{}: {}".format(players[i], scores[i])
+            numCards = len(hands[players[i]])
+            text = "{}: {} pts, {} cards".format(players[i], scores[i], numCards)
             text_width, text_height = font.size(text)
             message = font.render(text, 1 , black)
             xstart = 50
@@ -464,13 +475,39 @@ def rulesButton(window, count, pos):
         return buttonColor
 
 def playerHasUNO(hands):
-    hasUNO = {}
+    hasUNO = []
     for player in hands:
         if len(hands[player]) == 1:
-            #we will update the condition to True when the player calls UNO. To start it will be False.
-            hasUNO[player] = False
+            hasUNO.append(player)
     if len(hasUNO) >= 1:
-        return True, hasUNO
+        return hasUNO
+
+def callUNOButton(window):
+    end_time = time() + 5 
+    while time() < end_time:
+        pos = pygame.mouse.get_pos()
+        buttonColor = black
+        buttonSize = 2
+        for e in pygame.event.get():
+            # pos = pygame.mouse.get_pos()
+            font = pygame.font.SysFont("arial", 30)
+            text = "UNO!"
+            buttonPosition = (50, 350, 150, 50)
+            if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+                    if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                        buttonColor = green
+                        buttonSize = 4
+            pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+            text_width, text_height = font.size(text)
+            message = font.render(text,1,black)
+            xstart = buttonPosition[0] + ((150-text_width)/2)
+            ystart = buttonPosition[1] + ((50 -text_height)/2)
+            window.blit(message,(xstart,ystart))
+            if e.type == pygame.MOUSEBUTTONDOWN and buttonColor == green:
+                return True
+        pygame.display.update()
+            # return buttonColor
+
         
 
 if __name__=="__main__":
