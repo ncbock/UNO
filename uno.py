@@ -652,9 +652,6 @@ def quitButton(window, pos, count, gameWon):
     window.blit(message,(xstart,ystart))
     return buttonColor
 
-
-
-
 if __name__=="__main__":
     main()
     pygame.quit()
