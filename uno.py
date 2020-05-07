@@ -25,7 +25,7 @@ def main():
 
     #Set each players initial score to 0
     for i in range(len(players)):
-        scores.append(0)
+        scores.append(499)
 
     #First Discard card can not be a Draw 4 card
     if deck[0] != "+4":
@@ -143,6 +143,25 @@ def main():
                         for i in range(4):
                             hands[player].append(deck[0])
                             deck.pop(0)
+                            
+            # Restart the game
+            if e.type == pygame.MOUSEBUTTONDOWN and playAgain(window, pos) == green:
+                gameWon = False
+                count = 0
+                hands, deck = createHands(players)
+                scores = []
+                for i in range(len(players)):
+                    scores.append(499)
+                if deck[0] != "+4":
+                    playedPile = deck.pop(0)
+                else:
+                    deck.append(deck[0])
+                    playedPile = deck.pop(0)
+                playTurn = 0
+                reverse = False
+                playerSelect = False
+                showHand = False
+                calledUNO = []
 
             #Open the rules of the game.
             if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count, pos) == green:
@@ -190,6 +209,7 @@ def main():
         else:
             window.fill(white)
             printWinner(window, players, scores)
+            playAgain(window, pos)
 
         
         #Update the Display
@@ -235,7 +255,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(7):
+    for i in range(1):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -576,13 +596,34 @@ def opponentUNOButton(window, count, pos):
 def printWinner(window, players, scores):
     for i in range(len(scores)):
         if scores[i] >= 500:
-            font = pygame.font.SysFont("arial",40)
+            font = pygame.font.SysFont("arial",60)
             text = "{} Wins!".format(players[i])
             text_width, text_height = font.size(text)
             xstart = 375 - (text_width/2)
             ystart = 375 - (text_height/2)
             message = font.render(text, 1, gold)
             window.blit(message,(xstart,ystart))
+
+def playAgain(window, pos):
+    font = pygame.font.SysFont("arial",30)
+    text = "Play Again"
+    buttonColor = black
+    buttonSize = 2
+    buttonPosition = (300, 420, 150, 50)
+    if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+            if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                buttonColor = green
+                buttonSize = 4
+    pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+    text_width, text_height =font.size(text)
+    message = font.render(text,1, black)
+    xstart = buttonPosition[0] + ((150-text_width)/2)
+    ystart = buttonPosition[1] + ((50 -text_height)/2)
+    window.blit(message,(xstart,ystart))
+    return buttonColor
+
+
+
 
 if __name__=="__main__":
     main()
