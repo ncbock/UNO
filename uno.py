@@ -13,7 +13,6 @@ blue = (0, 0, 255)
 
 clock = pygame.time.Clock()
 
-
 def main():
     pygame.init()
     window = pygame.display.set_mode((750,750))
@@ -49,6 +48,8 @@ def main():
 
     #players who have UNO and have called it.
     calledUNO = []
+
+    gameWon = False
 
     while True:
         pos = pygame.mouse.get_pos()
@@ -138,8 +139,6 @@ def main():
             # Add cards to players who have not called UNO when called out.
             if e.type == pygame.MOUSEBUTTONDOWN and opponentUNOButton(window, count, pos) == green:
                 for player in currentUNOHands:
-                    print(currentUNOHands)
-                    print(calledUNO)
                     if player not in calledUNO:
                         for i in range(4):
                             hands[player].append(deck[0])
@@ -150,42 +149,47 @@ def main():
                 open("https://service.mattel.com/instruction_sheets/42001pr.pdf")
 
         #Display all info after this point
-        window.fill(white)
-        startButton(window,count, pos)
-        displayUNO(window,count)
-        rulesButton(window, count, pos)
-        whoseTurn(window, count, playTurn, players)
-        playCardButton(window,count, pos)    
-        opponentUNOButton(window, count, pos)  
-        if showHand:
-            cardLocations = displayHand(window, players[playTurn], hands, count)
-            hoverBox(window, count, cardLocations, pos)
-        hideCards(window, count, showHand, pos)
-        if playerSelect:
-            #Draw a rectangle when the player selects a card
-            pygame.draw.rect(window,black, boxLocation,2)
+        if not gameWon:
+            window.fill(white)
+            startButton(window,count, pos)
+            displayUNO(window,count)
+            rulesButton(window, count, pos)
+            whoseTurn(window, count, playTurn, players)
+            playCardButton(window,count, pos)    
+            opponentUNOButton(window, count, pos)  
+            if showHand:
+                cardLocations = displayHand(window, players[playTurn], hands, count)
+                hoverBox(window, count, cardLocations, pos)
+            hideCards(window, count, showHand, pos)
+            if playerSelect:
+                #Draw a rectangle when the player selects a card
+                pygame.draw.rect(window,black, boxLocation,2)
 
-        # Player will get 5 seconds when the card is played to call uno before their turn is over.
-        # This will give them their entire turn to call uno again when it becomes their turn again.
-        if len(hands[players[playTurn]]) == 1 and players[playTurn] not in calledUNO:
-            callUNOButtonPerm(window, pos)
-        if roundWinner(hands):
-            winnerIndex = players.index(roundWinner(hands)[1])
-            roundScore = updateScores(hands)
-            scores[winnerIndex] += roundScore
-            # need to see if a player has reached 500 points
-            #create new Hands and empty the Called UNO list
-            hands, deck = createHands(players)
-            calledUNO = []
-        displayScores(window, count, players, scores, hands)
-        cardsPlayed(window, count, playedPile)
-        drawCards(window, count, pos)
-        currentUNOHands = playerHasUNO(hands)
-        # remove the players uno call if he no longer has uno
-        if len(calledUNO) != 0:
-            for player in calledUNO:
-                if player not in currentUNOHands:
-                    calledUNO.pop(calledUNO.index(player))
+            # Player will get 5 seconds when the card is played to call uno before their turn is over.
+            # This will give them their entire turn to call uno again when it becomes their turn again.
+            if len(hands[players[playTurn]]) == 1 and players[playTurn] not in calledUNO:
+                callUNOButtonPerm(window, pos)
+            if roundWinner(hands):
+                winnerIndex = players.index(roundWinner(hands)[1])
+                roundScore = updateScores(hands)
+                scores[winnerIndex] += roundScore
+                if scores[winnerIndex] < 500:
+                    hands, deck = createHands(players)
+                    calledUNO = []
+                else:
+                    gameWon = True
+            displayScores(window, count, players, scores, hands)
+            cardsPlayed(window, count, playedPile)
+            drawCards(window, count, pos)
+            currentUNOHands = playerHasUNO(hands)
+            # remove the players uno call if he no longer has uno
+            if len(calledUNO) != 0:
+                for player in calledUNO:
+                    if player not in currentUNOHands:
+                        calledUNO.pop(calledUNO.index(player))
+        else:
+            window.fill(white)
+            printWinner(window, players, scores)
 
         
         #Update the Display
@@ -231,7 +235,7 @@ def createHands(players):
     for player in players:
         currentHands[player] = []
     #Each player to recieve 7 cards, essentially deal the cards
-    for i in range(2):
+    for i in range(7):
         for player in players:
             #Add first card of the shuffled deck to the players hand
             currentHands[player].append(deck[0])
@@ -568,6 +572,17 @@ def opponentUNOButton(window, count, pos):
         ystart = buttonPosition[1] + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
         return buttonColor
+
+def printWinner(window, players, scores):
+    for i in range(len(scores)):
+        if scores[i] >= 500:
+            font = pygame.font.SysFont("arial",40)
+            text = "{} Wins!".format(players[i])
+            text_width, text_height = font.size(text)
+            xstart = 375 - (text_width/2)
+            ystart = 375 - (text_height/2)
+            message = font.render(text, 1, gold)
+            window.blit(message,(xstart,ystart))
 
 if __name__=="__main__":
     main()
