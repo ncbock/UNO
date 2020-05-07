@@ -70,7 +70,7 @@ def main():
                     cardIndex = hands[players[playTurn]].index(selectedCard)
                     hands[players[playTurn]].pop(cardIndex)
                     if len(hands[players[playTurn]]) == 1:
-                        if callUNOButton(window):
+                        if callUNOButtonTemp(window):
                             calledUNO.append(players[playTurn])
                     if "+2" in playedPile:
                         nextPlayer = changePlayer(players, playTurn, reverse)
@@ -131,6 +131,9 @@ def main():
                     showHand = not showHand
                     playerSelect = False
 
+            if e.type == pygame.MOUSEBUTTONDOWN and callUNOButtonPerm(window, pos) == green:
+                calledUNO.append(players[playTurn])
+
             #Open the rules of the game.
             if e.type == pygame.MOUSEBUTTONDOWN and rulesButton(window,count, pos) == green:
                 open("https://service.mattel.com/instruction_sheets/42001pr.pdf")
@@ -150,6 +153,11 @@ def main():
         if playerSelect:
             #Draw a rectangle when the player selects a card
             pygame.draw.rect(window,black, boxLocation,2)
+
+        # Player will get 5 seconds when the card is played to call uno before their turn is over.
+        # This will give them their entire turn to call uno again when it becomes their turn again.
+        if len(hands[players[playTurn]]) == 1 and players[playTurn] not in calledUNO:
+            callUNOButtonPerm(window, pos)
         if roundWinner(hands):
             winnerIndex = players.index(roundWinner(hands)[1])
             roundScore = updateScores(hands)
@@ -167,6 +175,7 @@ def main():
             for player in calledUNO:
                 if player not in currentUNOHands:
                     calledUNO.pop(calledUNO.index(player))
+
         
         #Update the Display
         pygame.display.update()
@@ -484,10 +493,9 @@ def playerHasUNO(hands):
     for player in hands:
         if len(hands[player]) == 1:
             hasUNO.append(player)
-    if len(hasUNO) >= 1:
-        return hasUNO
+    return hasUNO
 
-def callUNOButton(window):
+def callUNOButtonTemp(window):
     end_time = time() + 5 
     while time() < end_time:
         pos = pygame.mouse.get_pos()
@@ -511,7 +519,24 @@ def callUNOButton(window):
             if e.type == pygame.MOUSEBUTTONDOWN and buttonColor == green:
                 return True
         pygame.display.update()
-            # return buttonColor
+        
+def callUNOButtonPerm(window, pos):
+        buttonColor = black
+        buttonSize = 2
+        font = pygame.font.SysFont("arial", 30)
+        text = "UNO!"
+        buttonPosition = (50, 230, 150, 50)
+        if pos[0] in range(buttonPosition[0],buttonPosition[0]+buttonPosition[2]+ 1): 
+                if pos[1] in range(buttonPosition[1],buttonPosition[1]+buttonPosition[3]+ 1):
+                    buttonColor = green
+                    buttonSize = 4
+        pygame.draw.rect(window, buttonColor, buttonPosition, buttonSize)
+        text_width, text_height = font.size(text)
+        message = font.render(text,1,black)
+        xstart = buttonPosition[0] + ((150-text_width)/2)
+        ystart = buttonPosition[1] + ((50 -text_height)/2)
+        window.blit(message,(xstart,ystart))
+        return buttonColor
 
 def opponentUNOButton(window, count, pos):
     if count > 0:
@@ -531,8 +556,6 @@ def opponentUNOButton(window, count, pos):
         xstart = buttonPosition[0] + ((150-text_width)/2)
         ystart = buttonPosition[1] + ((50 -text_height)/2)
         window.blit(message,(xstart,ystart))
-
-
 
 if __name__=="__main__":
     main()
